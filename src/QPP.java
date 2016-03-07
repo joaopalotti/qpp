@@ -279,7 +279,7 @@ public class QPP implements QPPInterface {
         CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
 
         String[] FILE_HEADER = {"qid","avgQL","avgIDF","avgICTF","maxIDF","devIDF","SCS", "sumSCQ","avgSCQ",
-                "maxSCQ","QS"};
+                "maxSCQ","QS", "sumVar", "avgVar", "maxVar", "avgPMI", "maxPMI"};
 
         CSVPrinter csvFilePrinter = null;
         try{
