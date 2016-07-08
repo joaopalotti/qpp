@@ -176,7 +176,7 @@ public class QPP implements QPPInterface {
 	public double getICTF(String term) {
 		int colFreq = this.getCollectionFrequency(term);
 	    if (colFreq > 0)
-	    	return QPPMath.log2(this.getTotalNumberOfTokens()) - QPPMath.log2(colFreq);
+	    	return QPPMath.log2(1. * this.getTotalNumberOfTokens()) - QPPMath.log2(1. * colFreq);
 	    return 0.0;
 	}
 
