@@ -174,9 +174,9 @@ public class QPP implements QPPInterface {
 
 	@Override
 	public double getICTF(String term) {
-		int docFreq = this.getDocumentFrequency(term);
-	    if (docFreq > 0)
-	    	return QPPMath.log2(this.getTotalNumberOfTokens()) - QPPMath.log2(docFreq);
+		int colFreq = this.getCollectionFrequency(term);
+	    if (colFreq > 0)
+	    	return QPPMath.log2(this.getTotalNumberOfTokens()) - QPPMath.log2(colFreq);
 	    return 0.0;
 	}
 
