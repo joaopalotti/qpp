@@ -22,7 +22,7 @@ public class QPPTerrier extends TRECQuerying {
 
 	public QPPTerrier(){
 	}
-		
+
 	@SuppressWarnings("finally")
 	public int getDocumentFrequency(String term){
         Lexicon<String> lex = index.getLexicon();
@@ -38,6 +38,21 @@ public class QPPTerrier extends TRECQuerying {
             return docFreq;
         }	
 	}
+
+    public int getCollectionFrequency(String term){
+        Lexicon<String> lex = index.getLexicon();
+        LexiconEntry le = lex.getLexiconEntry(term);
+        int colFreq = 0;
+        try{
+            colFreq = le.getFrequency();
+        }
+        catch(Exception e){
+            logger.error("Could not get collection frequency for term: " + term + " --- Resulted in Error:" +  e.getMessage());
+        }
+        finally{
+            return colFreq;
+        }
+    }
 
     public List<Integer> getTermFrequencies(String term){
 

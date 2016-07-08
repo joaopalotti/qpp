@@ -13,8 +13,6 @@ public class QPP implements QPPInterface {
 	/** The logger used */
 	protected static final Logger logger = Logger.getLogger(QPP.class);
 
-	protected PrintWriter qppResultFile;
-	
 	// Specificity (Pre-retrieval QPPs)
 	protected Map<String, Double> avgQL;   // Averaged Query Length
 	protected Map<String, Double> avgIDF;  // Averaged Inverse Document Frequency
@@ -97,6 +95,11 @@ public class QPP implements QPPInterface {
 		return se.getDocumentFrequency(term);
 	}
 
+    @Override
+    public int getCollectionFrequency(String term) {
+        return se.getCollectionFrequency(term);
+    }
+
 	@Override
 	public int getTotalNumberOfDocuments() {
 		return this.totalNumberOfDocuments;
@@ -112,7 +115,7 @@ public class QPP implements QPPInterface {
 		return se.getPostings(term);
 	}
 
-	
+    
 	@Override
 	public void getSpecificityPreRetrievalPredictors() {
 		
@@ -123,7 +126,9 @@ public class QPP implements QPPInterface {
 			double[] idfs = new double[terms.size()];
 			double[] ictf = new double[terms.size()];
 			double[] scqs = new double[terms.size()];
-			double[] termLength = new double[terms.size()];
+			double[] termLength
+
+                    = new double[terms.size()];
 			Set<Integer> setOfPostings = new HashSet<Integer>();
 			
 			logger.info("QueryId:" + query.queryId + " - Query:" + query.query + " AfterProcess:" + terms);
@@ -172,7 +177,7 @@ public class QPP implements QPPInterface {
 	public double getSCQ(String term) {
         int docFreq = this.getDocumentFrequency(term);
         if (docFreq > 0){
-            double t1 = 1. + QPPMath.log(this.getTotalNumberOfTokens());
+            double t1 = 1. + QPPMath.log(this.getCollectionFrequency(term));
             double t2 = QPPMath.log(1. + 1. * this.getTotalNumberOfDocuments() / docFreq);
             return t1 * t2;
         }
@@ -243,7 +248,7 @@ public class QPP implements QPPInterface {
             int lastLoop = 0;
             for(int i = 0; i < terms.size(); i++){
                 String ti = terms.get(i).toString();
-                for(int j = i; j < terms.size(); j++) {
+                for(int j = i+1; j < terms.size(); j++) {
                     String tj = terms.get(j).toString();
                     double pmi = getPMI(ti, tj);
                     pmis[lastLoop + j - i] = pmi;
@@ -272,7 +277,6 @@ public class QPP implements QPPInterface {
         else
             return 0.0;
     }
-
 	
 	public void printResults(PrintWriter out){
 

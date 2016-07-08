@@ -17,6 +17,7 @@ public interface QPPInterface {
 
     // Search related functions
     int getDocumentFrequency(String term);
+    int getCollectionFrequency(String term);
     int getTotalNumberOfDocuments();
     long getTotalNumberOfTokens();
     Set<Integer> getPostings(String term);
