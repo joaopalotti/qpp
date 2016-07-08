@@ -18,7 +18,8 @@ public class QPP implements QPPInterface {
 	protected Map<String, Double> avgIDF;  // Averaged Inverse Document Frequency
 	protected Map<String, Double> avgICTF; // Maximum Inverse Document Frequency
 	protected Map<String, Double> maxIDF;  // Standard Deviation of IDF
-	protected Map<String, Double> devIDF;  // Averaged Inverse Collection Term Frequency
+    protected Map<String, Double> minIDF;  // Minimum Inverse Document Frequency
+    protected Map<String, Double> devIDF;  // Averaged Inverse Collection Term Frequency
     //
 	protected Map<String, Double> SCS;     // Simplified Clarity Score
 	protected Map<String, Double> sumSCQ;  // Summed Collection Query Similarity
@@ -59,11 +60,13 @@ public class QPP implements QPPInterface {
     	
     	this.totalNumberOfDocuments = se.getTotalNumberOfDocuments();
     	this.totalNumberOfTokens = se.getTotalNumberOfTokens();
-    	
+
+        // Specificity (Pre-retrieval QPPs)
     	avgQL = new HashMap<String, Double>(queries.size());
     	avgIDF = new HashMap<String, Double>(queries.size());
     	avgICTF = new HashMap<String, Double>(queries.size());
     	maxIDF = new HashMap<String, Double>(queries.size());
+        minIDF = new HashMap<String, Double>(queries.size());
     	devIDF = new HashMap<String, Double>(queries.size());
     	SCS = new HashMap<String, Double>(queries.size());
     	sumSCQ = new HashMap<String, Double>(queries.size());
@@ -71,10 +74,15 @@ public class QPP implements QPPInterface {
     	maxSCQ = new HashMap<String, Double>(queries.size());
     	QS = new HashMap<String, Double>(queries.size());
 
+        // RankSensitivity (Pre-retrieval QPPs)
         sumVar = new HashMap<String, Double>(queries.size());
         avgVar = new HashMap<String, Double>(queries.size());
         maxVar = new HashMap<String, Double>(queries.size());
 
+        // Ambiguity (Pre-retrieval QPPs)
+        //TODO: missing implementation of these methods.
+
+        // Term Relatedness (Pre-retrieval QPPs)
         avgPMI = new HashMap<String, Double>(queries.size());
         maxPMI = new HashMap<String, Double>(queries.size());
 
@@ -126,9 +134,7 @@ public class QPP implements QPPInterface {
 			double[] idfs = new double[terms.size()];
 			double[] ictf = new double[terms.size()];
 			double[] scqs = new double[terms.size()];
-			double[] termLength
-
-                    = new double[terms.size()];
+			double[] termLength = new double[terms.size()];
 			Set<Integer> setOfPostings = new HashSet<Integer>();
 			
 			logger.info("QueryId:" + query.queryId + " - Query:" + query.query + " AfterProcess:" + terms);
@@ -146,12 +152,13 @@ public class QPP implements QPPInterface {
 			avgIDF.put(query.queryId, QPPMath.mean(idfs));
 			avgICTF.put(query.queryId, QPPMath.mean(ictf));
 			maxIDF.put(query.queryId, QPPMath.max(idfs));
+            minIDF.put(query.queryId, QPPMath.min(idfs));
 			devIDF.put(query.queryId, QPPMath.standardDeviation(idfs));
 			SCS.put(query.queryId, (QPPMath.log2(1.0/terms.size()) + avgICTF.get(query.queryId)));
 			sumSCQ.put(query.queryId, QPPMath.sum(scqs));
 			avgSCQ.put(query.queryId, QPPMath.mean(scqs));
 			maxSCQ.put(query.queryId, QPPMath.max(scqs));
-			QS.put(query.queryId, -1. * QPPMath.log(1. * setOfPostings.size() / this.getTotalNumberOfDocuments()));
+			QS.put(query.queryId, -1. * QPPMath.log(1. * setOfPostings.size()) - qpp.QPPMath.log(this.getTotalNumberOfDocuments()));
 
 		    logger.info("Maximum Number of documents returned by query: " + setOfPostings.size());
 		}
@@ -282,7 +289,7 @@ public class QPP implements QPPInterface {
 
         CSVFormat csvFileFormat = CSVFormat.DEFAULT.withRecordSeparator("\n");
 
-        String[] FILE_HEADER = {"qid","avgQL","avgIDF","avgICTF","maxIDF","devIDF","SCS", "sumSCQ","avgSCQ",
+        String[] FILE_HEADER = {"qid","avgQL","avgIDF","avgICTF","maxIDF","minIDF","devIDF","SCS", "sumSCQ","avgSCQ",
                 "maxSCQ","QS", "sumVar", "avgVar", "maxVar", "avgPMI", "maxPMI"};
 
         CSVPrinter csvFilePrinter = null;
@@ -299,6 +306,7 @@ public class QPP implements QPPInterface {
                 record.add(avgIDF.get(qid));
                 record.add(avgICTF.get(qid));
                 record.add(maxIDF.get(qid));
+                record.add(minIDF.get(qid));
                 record.add(devIDF.get(qid));
                 record.add(SCS.get(qid));
                 record.add(sumSCQ.get(qid));
